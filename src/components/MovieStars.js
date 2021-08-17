@@ -6,6 +6,7 @@ export const MovieStars = ({ voteAverage }) => {
     for (let i = 0; i < 5; i++) {
       stars.push(
         <i
+          key={i}
           className={countVoteAverage() > i ? "bx bxs-star" : "bx bx-star"}
         ></i>
       );
@@ -17,5 +18,5 @@ export const MovieStars = ({ voteAverage }) => {
     return Math.ceil(voteAverage / 2);
   };
 
-  return <div className="starts">{rednerStars()}</div>;
+  return <div className="stars">{rednerStars()}</div>;
 };

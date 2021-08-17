@@ -1,24 +1,96 @@
-import React, { useState } from "react";
+import React from "react";
 
 export const MoviesListPagination = ({
   currentPage,
   setCurrentPage,
   pagesAmount,
+  pagesOffSet,
 }) => {
   const renderPaginationButtons = () => {
     const buttons = [];
-    for (let i = 1; i <= pagesAmount; i++) {
+
+    buttons.push(
+      <button
+        className={
+          currentPage === 1 ? "pagination-btn--active" : "pagination-btn"
+        }
+        key={1}
+        onClick={() => {
+          setCurrentPage(1);
+        }}
+      >
+        {1}
+      </button>
+    );
+    if (currentPage - pagesOffSet > 1) buttons.push(<span>...</span>);
+
+    for (let i = pagesOffSet; i >= 1; i--) {
+      if (currentPage - i > 1) {
+        buttons.push(
+          <button
+            className={
+              currentPage === currentPage - i
+                ? "pagination-btn--active"
+                : "pagination-btn"
+            }
+            key={currentPage - i}
+            onClick={() => {
+              setCurrentPage(currentPage - i);
+            }}
+          >
+            {currentPage - i}
+          </button>
+        );
+      }
+    }
+    if (currentPage > 1 && currentPage < pagesAmount)
       buttons.push(
         <button
-          key={i}
+          className="pagination-btn--active"
+          key={currentPage}
           onClick={() => {
-            setCurrentPage(i);
+            setCurrentPage(currentPage);
           }}
         >
-          {i}
+          {currentPage}
         </button>
       );
+    for (let i = 1; i <= pagesOffSet; i++) {
+      if (currentPage + i < pagesAmount) {
+        buttons.push(
+          <button
+            className={
+              currentPage === currentPage + i
+                ? "pagination-btn--active"
+                : "pagination-btn"
+            }
+            key={currentPage + i}
+            onClick={() => {
+              setCurrentPage(currentPage + i);
+            }}
+          >
+            {currentPage + i}
+          </button>
+        );
+      }
     }
+    if (currentPage + pagesOffSet < pagesAmount - 1)
+      buttons.push(<span>...</span>);
+    buttons.push(
+      <button
+        className={
+          currentPage === pagesAmount
+            ? "pagination-btn--active"
+            : "pagination-btn"
+        }
+        key={pagesAmount}
+        onClick={() => {
+          setCurrentPage(pagesAmount);
+        }}
+      >
+        {pagesAmount}
+      </button>
+    );
     return buttons;
   };
 

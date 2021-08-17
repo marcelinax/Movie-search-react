@@ -33,7 +33,9 @@ export const MoviesList = () => {
           currentGenre === 1 ? "&query=a" : ""
         }${search !== "" ? `&query=${search}` : ""}${
           sortBy !== "" ? `&sort_by=${sortBy}` : ""
-        }${currentGenre !== 1 ? "&with_genres=" : ""}&page=${currentPage}`
+        }${
+          currentGenre !== 1 ? `&with_genres=${currentGenre}` : ""
+        }&page=${currentPage}`
       )
       .then((res) => {
         setMovies(res.data.results);
@@ -59,9 +61,9 @@ export const MoviesList = () => {
   };
 
   const renderMovies = () => {
-    return movies.map((movie, index) => (
+    return movies.map((movie) => (
       <MovieItem
-        key={index}
+        key={movie.id}
         title={movie.original_title}
         posterUrl={movie.poster_path}
         overview={movie.overview}
@@ -75,13 +77,16 @@ export const MoviesList = () => {
   const renderGenresButtons = () => {
     return (
       <>
-        <button onClick={() => setCurrentGenre(1)}>All</button>
+        <button className="genre-btn" onClick={() => setCurrentGenre(1)}>
+          All
+        </button>
         {genres.map((genre) => (
           <GenreButton
             key={genre.id}
             genreId={genre.id}
             genre={genre.name}
             setCurrentGenre={setCurrentGenre}
+            currentGenre={currentGenre}
           />
         ))}
       </>
@@ -97,24 +102,32 @@ export const MoviesList = () => {
   }, [genres, currentGenre, search, sortBy]);
 
   return (
-    <div className="movies-list">
-      <div className="genres-btn">{renderGenresButtons()}</div>
-      <SortMovieBy
-        setSortBy={(e) => {
-          setSortBy(e.target.value);
-        }}
-        sortBy={sortBy}
-      ></SortMovieBy>
-      <FilterMovies
-        search={search}
-        setSearch={(e) => {
-          setSearch(e.target.value);
-        }}
-      />
-      {renderMovies()}
+    <div className="home-page">
+      <div className="top-bar">
+        <div className="genres-btns">{renderGenresButtons()}</div>
+        <i className="bx bx-power-off"></i>
+      </div>
+      <div className="searching-movie-box">
+        <FilterMovies
+          search={search}
+          setSearch={(e) => {
+            setSearch(e.target.value);
+          }}
+        />
+        <SortMovieBy
+          setSortBy={(e) => {
+            setSortBy(e.target.value);
+          }}
+          sortBy={sortBy}
+        ></SortMovieBy>
+      </div>
+
+      <div className="movies-list">{renderMovies()}</div>
       <MoviesListPagination
         setCurrentPage={setCurrentPage}
         pagesAmount={pagesAmount}
+        currentPage={currentPage}
+        pagesOffSet={2}
       ></MoviesListPagination>
     </div>
   );
