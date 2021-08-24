@@ -76,21 +76,25 @@ export const MoviesListPagination = ({
     }
     if (currentPage + pagesOffSet < pagesAmount - 1)
       buttons.push(<span>...</span>);
-    buttons.push(
-      <button
-        className={
-          currentPage === pagesAmount
-            ? "pagination-btn--active"
-            : "pagination-btn"
-        }
-        key={pagesAmount}
-        onClick={() => {
-          setCurrentPage(pagesAmount);
-        }}
-      >
-        {pagesAmount}
-      </button>
-    );
+    if (pagesAmount < 2) return;
+    else {
+      buttons.push(
+        <button
+          className={
+            currentPage === pagesAmount
+              ? "pagination-btn--active"
+              : "pagination-btn"
+          }
+          key={pagesAmount}
+          onClick={() => {
+            setCurrentPage(pagesAmount);
+          }}
+        >
+          {pagesAmount}
+        </button>
+      );
+    }
+
     return buttons;
   };
 

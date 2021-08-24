@@ -190,29 +190,117 @@
           color: #3aaea1;
           outline: none;
           cursor: pointer;
+          font-size: 0.9rem;
         }
       }
-      .filter-movies {
+      .filter-movie-input {
         position: relative;
         align-items: center;
         display: flex;
+        flex-direction: column;
         color: #3aaea1;
+
         input {
-          width: 100%;
-          border-bottom: 1px solid #3aaea1 !important;
           border: none;
           outline: none;
           color: #3aaea1;
-          padding: 0 0.5rem 0.3rem 1.5rem;
+          max-height: 50px;
 
           &::placeholder {
             color: #3aaea1;
           }
         }
-        i {
+        .delete-all-btn {
           position: absolute;
           top: 0;
-          left: 0;
+          right: 0;
+          cursor: pointer;
+          font-size: 1.5rem;
+        }
+        &-results {
+          display: none;
+          &--shown {
+            display: flex;
+            box-shadow: 0 0 15px rgba(#000, 0.2);
+            background-color: white;
+            z-index: 2;
+            max-height: 100px;
+            width: 100%;
+            flex-direction: column;
+            overflow: auto;
+            align-items: center;
+            padding: 10px 0;
+            .filter-movie-input-result {
+              display: flex;
+              width: 100%;
+              cursor: pointer;
+              align-items: center;
+              justify-content: center;
+
+              p {
+                font-size: 13px;
+              }
+              &:hover {
+                background-color: #3aaea1;
+                p {
+                  color: white;
+                }
+              }
+            }
+
+            &::-webkit-scrollbar {
+              width: 10px;
+            }
+
+            &::-webkit-scrollbar-track {
+              background: #f1f1f1;
+            }
+
+            &::-webkit-scrollbar-thumb {
+              background: #3aaea1;
+              border-radius: 20px;
+            }
+
+            &::-webkit-scrollbar-thumb:hover {
+              background: #3aaea1;
+            }
+          }
+        }
+        .chosen-keywords {
+          display: flex;
+        }
+        .input-box {
+          display: flex;
+          padding: 0 0.5rem 0.3rem 1.5rem;
+          width: 100%;
+          border-bottom: 1px solid #3aaea1 !important;
+          max-width: 500px;
+          flex-wrap: wrap;
+          .chosen-keyword {
+            background-color: #3aaea1;
+            margin-right: 5px;
+            font-size: 0.9rem;
+            padding: 0.2rem;
+            border-radius: 4px;
+            display: flex;
+            align-items: center;
+            padding-right: 20px;
+            position: relative;
+            margin-bottom: 0.2rem;
+
+            p {
+              color: white;
+            }
+
+            i {
+              font-size: 1rem;
+              position: absolute;
+              top: 0;
+              right: 0;
+              color: white;
+              cursor: pointer;
+            }
+          }
         }
       }
     }

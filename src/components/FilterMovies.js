@@ -1,10 +1,30 @@
 import React from "react";
 
-export const FilterMovies = ({ search, setSearch }) => {
+export const FilterMovies = ({
+  movieKeywords,
+  setMovieKeywords,
+  keywordsResult,
+  chosenKeywords,
+  deleteAllKeywords,
+}) => {
   return (
-    <div className="filter-movies">
-      <i className="bx bx-search-alt-2"></i>
-      <input value={search} onChange={setSearch}></input>
+    <div className="filter-movie-input">
+      <div className="input-box">
+        {chosenKeywords}
+        <input value={movieKeywords} onChange={setMovieKeywords}></input>
+      </div>
+
+      <i onClick={deleteAllKeywords} className="bx bx-x delete-all-btn"></i>
+
+      <div
+        className={
+          movieKeywords !== ""
+            ? "filter-movie-input-results--shown"
+            : "filter-movie-input-results"
+        }
+      >
+        {keywordsResult}
+      </div>
     </div>
   );
 };

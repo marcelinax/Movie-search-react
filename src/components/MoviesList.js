@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import { logInUser, logOutUser } from "states/userSlice";
 
 import { FilterMovies } from "./FilterMovies";
 import { GenreButton } from "./GenreButton";
@@ -6,6 +7,7 @@ import MovieItem from "./MovieItem";
 import { MoviesListPagination } from "./MoviesListPagination";
 import { SortMovieBy } from "./SortMovieBy";
 import axios from "axios";
+import { useDispatch } from "react-redux";
 
 export const MoviesList = () => {
   const [movies, setMovies] = useState([]);
@@ -13,11 +15,18 @@ export const MoviesList = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [pagesAmount, setPagesAmount] = useState(0);
   const [currentGenre, setCurrentGenre] = useState(1);
-  const [search, setSearch] = useState("");
   const [sortBy, setSortBy] = useState("");
+  const dispatch = useDispatch();
+  const [keywords, setKeywords] = useState([]);
+  const [keyword, setKeyword] = useState("");
+  const [keywordsResult, setKeywordsResult] = useState([]);
+
+  const logOut = () => {
+    dispatch(logOutUser());
+  };
 
   const getMethod = () => {
-    if (sortBy !== "" && search === "") {
+    if (sortBy !== "" || keywords.length > 0) {
       return "discover";
     }
     if (currentGenre !== 1) {
@@ -31,15 +40,30 @@ export const MoviesList = () => {
       .get(
         `https://api.themoviedb.org/3/${getMethod()}/movie?api_key=c74028613530dedccb1b6461020788d1${
           currentGenre === 1 ? "&query=a" : ""
-        }${search !== "" ? `&query=${search}` : ""}${
-          sortBy !== "" ? `&sort_by=${sortBy}` : ""
-        }${
+        }${sortBy !== "" ? `&sort_by=${sortBy}` : ""}${
           currentGenre !== 1 ? `&with_genres=${currentGenre}` : ""
+        }${
+          keywords.length > 0
+            ? `&with_keywords=${keywords
+                .map((keyword) => keyword.id)
+                .join("|")}`
+            : ""
         }&page=${currentPage}`
       )
       .then((res) => {
         setMovies(res.data.results);
         setPagesAmount(res.data.total_pages);
+      });
+  };
+
+  const getKeywords = () => {
+    axios
+      .get(
+        `https://api.themoviedb.org/3/search/keyword?api_key=c74028613530dedccb1b6461020788d1&query=${keyword}&page=${currentPage}`
+      )
+      .then((res) => {
+        setKeywordsResult(res.data.results);
+        console.log(res.data.results);
       });
   };
 
@@ -61,21 +85,62 @@ export const MoviesList = () => {
   };
 
   const renderMovies = () => {
-    return movies.map((movie) => (
-      <MovieItem
-        key={movie.id}
-        title={movie.original_title}
-        posterUrl={movie.poster_path}
-        overview={movie.overview}
-        genres={getGenresByMovie(movie)}
-        yearProduction={movie.release_date}
-        voteAverage={movie.vote_average}
-      />
-    ));
+    return movies.length > 0
+      ? movies.map((movie) => (
+          <MovieItem
+            key={movie.id}
+            title={movie.original_title}
+            posterUrl={movie.poster_path}
+            overview={movie.overview}
+            genres={getGenresByMovie(movie)}
+            yearProduction={movie.release_date}
+            voteAverage={movie.vote_average}
+          />
+        ))
+      : null;
   };
 
+  const renderKeywordsResults = () => {
+    return keywordsResult.length > 0 && keyword !== ""
+      ? keywordsResult.map((keywordResult, index) => (
+          <div
+            className="filter-movie-input-result"
+            key={index}
+            onClick={() => {
+              if (keywords.includes(keywordResult)) return;
+              else setKeywords([...keywords, keywordResult]);
+            }}
+          >
+            <p>{keywordResult.name}</p>
+          </div>
+        ))
+      : null;
+  };
+
+  const deleteKeyword = (keywordName) => {
+    let newKeywords = keywords;
+    newKeywords = newKeywords.filter((keyword) => keyword.name !== keywordName);
+    setKeywords(newKeywords);
+  };
+
+  const renderChosenKeywords = () => {
+    return keywords.length > 0
+      ? keywords.map((keyword) => (
+          <div className="chosen-keyword" key={keyword.id}>
+            <p>{keyword.name}</p>
+
+            <i
+              className="bx bx-x"
+              onClick={() => {
+                deleteKeyword(keyword.name);
+              }}
+            ></i>
+          </div>
+        ))
+      : null;
+  };
   const renderGenresButtons = () => {
-    return (
+    return genres.length > 0 ? (
       <>
         <button className="genre-btn" onClick={() => setCurrentGenre(1)}>
           All
@@ -90,7 +155,7 @@ export const MoviesList = () => {
           />
         ))}
       </>
-    );
+    ) : null;
   };
 
   useEffect(() => {
@@ -99,20 +164,26 @@ export const MoviesList = () => {
 
   useEffect(() => {
     getAllMovies();
-  }, [genres, currentGenre, search, sortBy]);
+  }, [genres, currentGenre, sortBy, keywords]);
+  useEffect(() => {
+    getKeywords();
+  }, [keyword]);
 
   return (
     <div className="home-page">
       <div className="top-bar">
         <div className="genres-btns">{renderGenresButtons()}</div>
-        <i className="bx bx-power-off"></i>
+        <i className="bx bx-power-off" onClick={logOut}></i>
       </div>
       <div className="searching-movie-box">
         <FilterMovies
-          search={search}
-          setSearch={(e) => {
-            setSearch(e.target.value);
+          movieKeywords={keyword}
+          setMovieKeywords={(e) => {
+            setKeyword(e.target.value);
           }}
+          keywordsResult={renderKeywordsResults()}
+          chosenKeywords={renderChosenKeywords()}
+          deleteAllKeywords={() => setKeywords([])}
         />
         <SortMovieBy
           setSortBy={(e) => {
